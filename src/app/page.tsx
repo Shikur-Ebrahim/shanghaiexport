@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import { Vehicle } from "@/types/vehicle";
 import { fetchVehicles } from "@/lib/services/vehicles";
 import { Navbar } from "@/components/Navbar";
@@ -9,30 +10,20 @@ import { VehicleCatalog } from "@/components/VehicleCatalog";
 import { HowItWorks } from "@/components/HowItWorks";
 import { ShippingAssurance } from "@/components/ShippingAssurance";
 import { Footer } from "@/components/Footer";
-import { InquiryModal } from "@/components/InquiryModal";
-import { MessageSquare } from "lucide-react";
+import { MessageSquare, FileText } from "lucide-react";
 
 export default function Home() {
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
-  const [inquiryModalOpen, setInquiryModalOpen] = useState(false);
-  const [targetCarName, setTargetCarName] = useState("");
-  const [targetPort, setTargetPort] = useState("");
   const [activeBrandFilter, setActiveBrandFilter] = useState("");
 
   useEffect(() => {
     fetchVehicles().then((data) => setVehicles(data));
   }, []);
 
-  const handleOpenInquiry = (carName?: string, port?: string) => {
-    setTargetCarName(carName || "");
-    setTargetPort(port || "");
-    setInquiryModalOpen(true);
-  };
-
   return (
     <div className="min-h-screen bg-white text-neutral-900 flex flex-col font-sans selection:bg-neutral-900 selection:text-white">
       {/* Top Navbar */}
-      <Navbar onOpenInquiry={handleOpenInquiry} />
+      <Navbar />
 
       {/* Main Content Area */}
       <main className="flex-1">
@@ -42,7 +33,6 @@ export default function Home() {
         {/* Vehicle Catalog with Filters */}
         <VehicleCatalog
           vehicles={vehicles}
-          onOpenInquiry={handleOpenInquiry}
           activeBrandFilter={activeBrandFilter}
         />
 
@@ -56,14 +46,6 @@ export default function Home() {
       {/* Footer */}
       <Footer />
 
-      {/* Official RFQ / Inquiry Modal */}
-      <InquiryModal
-        isOpen={inquiryModalOpen}
-        onClose={() => setInquiryModalOpen(false)}
-        defaultVehicleName={targetCarName}
-        defaultPort={targetPort}
-      />
-
       {/* Mobile Floating Quick Action Bar (Mobile-first hit targets) */}
       <div className="fixed bottom-4 inset-x-4 sm:hidden z-30 flex items-center gap-2">
         <a
@@ -76,12 +58,13 @@ export default function Home() {
           <span>WhatsApp Chat</span>
         </a>
 
-        <button
-          onClick={() => handleOpenInquiry()}
+        <Link
+          href="/quote"
           className="flex-1 min-h-[50px] px-4 rounded-full bg-neutral-950 text-white font-bold text-sm flex items-center justify-center gap-1.5 shadow-xl active:scale-95"
         >
+          <FileText className="w-4 h-4" />
           <span>Get Quote</span>
-        </button>
+        </Link>
       </div>
 
     </div>

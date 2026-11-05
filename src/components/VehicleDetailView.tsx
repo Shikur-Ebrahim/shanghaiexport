@@ -5,7 +5,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { Vehicle } from "@/types/vehicle";
 import { PORT_SHIPPING_RATES } from "@/lib/data/vehicles";
-import { InquiryModal } from "./InquiryModal";
 import {
   ArrowLeft,
   Ship,
@@ -31,7 +30,6 @@ export function VehicleDetailView({ vehicle, relatedVehicles }: VehicleDetailVie
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [selectedPortIndex, setSelectedPortIndex] = useState(0);
   const [shippingMode, setShippingMode] = useState<"roro" | "container">("roro");
-  const [inquiryModalOpen, setInquiryModalOpen] = useState(false);
 
   const currentPort = PORT_SHIPPING_RATES[selectedPortIndex];
   const freightCost = shippingMode === "roro" ? currentPort.roro_usd : currentPort.container_40ft_usd;
@@ -354,13 +352,13 @@ Estimated CIF: $${estimatedTotalCif.toLocaleString()} USD`;
 
               {/* Action Buttons (Mobile Screen First) */}
               <div className="pt-2 space-y-2.5">
-                <button
-                  onClick={() => setInquiryModalOpen(true)}
+                <Link
+                  href={`/quote?vehicle=${encodeURIComponent(vehicle.name)}&vehicle_id=${encodeURIComponent(vehicle.id)}&port=${encodeURIComponent(currentPort.port)}&country=${encodeURIComponent(currentPort.country)}&shipping=${shippingMode}`}
                   className="w-full min-h-[50px] px-6 py-3 rounded-full bg-neutral-950 text-white font-bold text-sm hover:bg-neutral-800 transition-all shadow-md active:scale-95 flex items-center justify-center gap-2"
                 >
                   <FileCheck2 className="w-4 h-4" />
                   <span>Request Official Proforma Invoice</span>
-                </button>
+                </Link>
 
                 <a
                   href={`https://wa.me/8618812345678?text=${encodeURIComponent(whatsappMessage)}`}
@@ -422,15 +420,6 @@ Estimated CIF: $${estimatedTotalCif.toLocaleString()} USD`;
         )}
 
       </div>
-
-      {/* Inquiry Modal */}
-      <InquiryModal
-        isOpen={inquiryModalOpen}
-        onClose={() => setInquiryModalOpen(false)}
-        defaultVehicleName={vehicle.name}
-        defaultPort={currentPort.port}
-      />
-
     </div>
   );
 }

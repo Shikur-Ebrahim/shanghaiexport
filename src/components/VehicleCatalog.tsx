@@ -21,7 +21,7 @@ import {
 interface VehicleCatalogProps {
   vehicles: Vehicle[];
   onSelectCar?: (car: Vehicle) => void;
-  onOpenInquiry: (carName: string) => void;
+  onOpenInquiry?: (carName: string) => void;
   activeBrandFilter?: string;
 }
 

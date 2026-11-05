@@ -60,22 +60,22 @@ export function Navbar({ onOpenInquiry }: NavbarProps) {
               <span>WhatsApp Us</span>
             </a>
 
-            <button
-              onClick={() => onOpenInquiry?.()}
+            <Link
+              href="/quote"
               className="px-5 py-2.5 rounded-full bg-neutral-950 text-white hover:bg-neutral-800 text-sm font-semibold transition-all shadow-sm active:scale-95"
             >
               Get Free Quote
-            </button>
+            </Link>
           </div>
 
           {/* Mobile Hamburger */}
           <div className="flex items-center gap-2 lg:hidden">
-            <button
-              onClick={() => onOpenInquiry?.()}
+            <Link
+              href="/quote"
               className="px-3.5 py-2 rounded-full bg-neutral-950 text-white text-xs font-semibold sm:hidden active:scale-95"
             >
               Quote
-            </button>
+            </Link>
 
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -150,15 +150,13 @@ export function Navbar({ onOpenInquiry }: NavbarProps) {
                 <span>Chat on WhatsApp</span>
               </a>
 
-              <button
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  onOpenInquiry?.();
-                }}
-                className="w-full py-3.5 rounded-xl bg-neutral-950 text-white font-semibold text-sm"
+              <Link
+                href="/quote"
+                onClick={() => setMobileMenuOpen(false)}
+                className="w-full py-3.5 rounded-xl bg-neutral-950 text-white font-semibold text-sm flex items-center justify-center"
               >
                 Request Custom Quotation
-              </button>
+              </Link>
             </div>
           </div>
         </div>
