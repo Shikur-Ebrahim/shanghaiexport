@@ -21,17 +21,18 @@ export const metadata: Metadata = {
     "ShanghaiExport is your trusted partner for exporting electric vehicles, passenger cars, and commercial vehicles from China to destinations worldwide.",
   icons: {
     icon: [
-      { url: "/icon.jpg" },
+      { url: "/favicon.ico" },
+      { url: "/icon.png", type: "image/png" },
     ],
     apple: [
-      { url: "/apple-touch-icon.jpg" },
+      { url: "/apple-touch-icon.png", type: "image/png" },
     ],
   },
   openGraph: {
     title: "ShanghaiExport | Buy Cars in China. Ship Worldwide.",
     description:
       "Buy cars in China. Ship worldwide. Trusted global automotive export platform.",
-    images: [{ url: "/opengraph-image.jpg" }],
+    images: [{ url: "/opengraph-image.png" }],
   },
 };
 
