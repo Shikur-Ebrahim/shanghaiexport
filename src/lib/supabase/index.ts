@@ -1,4 +1,2 @@
-export { createClient as createBrowserClient } from "./client";
-export { createClient as createServerClient } from "./server";
-export { createAdminClient } from "./admin";
-export { updateSession } from "./middleware";
+export { createBrowserClient, createClient } from "./client";
+// Note: For Server Components or Route Handlers, import directly from "@/lib/supabase/server"
