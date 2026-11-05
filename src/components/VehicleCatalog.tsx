@@ -75,7 +75,7 @@ export function VehicleCatalog({
     (maxPrice < 160000 ? 1 : 0);
 
   return (
-    <section id="inventory" className="py-6 sm:py-12 bg-white">
+    <section id="inventory" className="py-2 sm:py-6 bg-white">
       <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
         
         {/* =====================================================================

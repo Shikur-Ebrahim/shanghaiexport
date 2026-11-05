@@ -35,17 +35,6 @@ export default function Home() {
     setSelectedVehicle(car);
   };
 
-  const handleSelectCarById = (carId: string) => {
-    const found = vehicles.find((v) => v.id === carId);
-    if (found) setSelectedVehicle(found);
-  };
-
-  const handleSearchFilters = (filters: { brand: string; bodyType: string; maxPrice: number }) => {
-    if (filters.brand) {
-      setActiveBrandFilter(filters.brand);
-    }
-  };
-
   return (
     <div className="min-h-screen bg-white text-neutral-900 flex flex-col font-sans selection:bg-neutral-900 selection:text-white">
       {/* Top Navbar */}
@@ -53,11 +42,8 @@ export default function Home() {
 
       {/* Main Content Area */}
       <main className="flex-1">
-        {/* NIO-Inspired Minimalist Automotive Hero */}
-        <HeroNio
-          onSearch={handleSearchFilters}
-          onSelectCar={handleSelectCarById}
-        />
+        {/* Minimal Title Header */}
+        <HeroNio />
 
         {/* Vehicle Catalog with Filters */}
         <VehicleCatalog
