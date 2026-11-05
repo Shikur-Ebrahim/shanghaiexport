@@ -22,7 +22,9 @@ import {
   X,
   Loader2,
   ExternalLink,
-  ShieldAlert
+  ShieldAlert,
+  UploadCloud,
+  ImageIcon
 } from "lucide-react";
 
 export default function AdminPage() {
@@ -48,8 +50,37 @@ export default function AdminPage() {
   const [formAcceleration, setFormAcceleration] = useState("3.8s");
   const [formBattery, setFormBattery] = useState(82);
   const [formImage, setFormImage] = useState("");
+  const [isUploading, setIsUploading] = useState(false);
   const [formStatus, setFormStatus] = useState<Vehicle["status"]>("Available");
   const [formFeatured, setFormFeatured] = useState(false);
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await res.json();
+      if (data.url) {
+        setFormImage(data.url);
+      } else {
+        alert("Upload failed: " + (data.error || "Unknown error"));
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Failed to upload image to Cloudflare R2");
+    } finally {
+      setIsUploading(false);
+    }
+  };
 
   useEffect(() => {
     loadData();
@@ -525,16 +556,57 @@ export default function AdminPage() {
                 </div>
               </div>
 
-              <div>
-                <label className="block text-xs font-bold text-neutral-700 mb-1">Image URL (Cloudflare R2 or Web URL)</label>
-                <input
-                  type="url"
-                  required
-                  value={formImage}
-                  onChange={(e) => setFormImage(e.target.value)}
-                  placeholder="https://pub-fd2ae53de5ae41b1aee16df0031dc281.r2.dev/car.png"
-                  className="w-full text-sm p-2.5 bg-neutral-50 rounded-xl border border-neutral-300 text-neutral-900"
-                />
+              {/* Cloudflare R2 Media Upload */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <label className="block text-xs font-bold text-neutral-700">
+                    Vehicle Photo (Stored on Cloudflare R2)
+                  </label>
+                  <span className="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
+                    R2 Bucket: shanghaiexport
+                  </span>
+                </div>
+
+                {/* Direct Upload Button */}
+                <div className="flex items-center gap-3">
+                  <label className="flex-1 cursor-pointer min-h-[46px] px-4 py-2.5 rounded-xl border-2 border-dashed border-neutral-300 hover:border-neutral-900 bg-neutral-50 hover:bg-neutral-100/70 transition-all flex items-center justify-center gap-2 text-xs font-semibold text-neutral-800">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleFileUpload}
+                      disabled={isUploading}
+                      className="hidden"
+                    />
+                    {isUploading ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin text-neutral-900" />
+                        <span>Uploading directly to Cloudflare R2...</span>
+                      </>
+                    ) : (
+                      <>
+                        <UploadCloud className="w-4 h-4 text-neutral-600" />
+                        <span>Choose file to upload to Cloudflare R2</span>
+                      </>
+                    )}
+                  </label>
+                </div>
+
+                {/* Image URL & Preview */}
+                <div className="flex items-center gap-3 mt-2">
+                  <input
+                    type="url"
+                    required
+                    value={formImage}
+                    onChange={(e) => setFormImage(e.target.value)}
+                    placeholder="https://pub-fd2ae53de5ae41b1aee16df0031dc281.r2.dev/vehicles/..."
+                    className="flex-1 text-xs p-2.5 bg-neutral-50 rounded-xl border border-neutral-300 text-neutral-900"
+                  />
+                  {formImage && (
+                    <div className="relative w-12 h-10 rounded-lg overflow-hidden border border-neutral-200 shrink-0 bg-neutral-100">
+                      <Image src={formImage} alt="Preview" fill className="object-cover" />
+                    </div>
+                  )}
+                </div>
               </div>
 
               <div className="flex items-center gap-6 pt-2">

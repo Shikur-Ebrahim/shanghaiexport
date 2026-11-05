@@ -19,9 +19,9 @@ export const INITIAL_VEHICLES: Vehicle[] = [
     featured: true,
     status: "Available",
     images: [
-      "https://images.unsplash.com/photo-1617788138017-80ad40651399?auto=format&fit=crop&w=1200&q=80",
-      "https://images.unsplash.com/photo-1542362567-b07e54358753?auto=format&fit=crop&w=1200&q=80",
-      "https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1200&q=80"
+      "https://pub-fd2ae53de5ae41b1aee16df0031dc281.r2.dev/vehicles/xiaomi-su7-max.jpg",
+      "https://pub-fd2ae53de5ae41b1aee16df0031dc281.r2.dev/vehicles/geely-galaxy-e8.jpg",
+      "https://pub-fd2ae53de5ae41b1aee16df0031dc281.r2.dev/vehicles/byd-seal.jpg"
     ],
     color_options: [
       { name: "Aqua Blue", hex: "#1A4968" },
@@ -48,8 +48,8 @@ export const INITIAL_VEHICLES: Vehicle[] = [
     featured: true,
     status: "Available",
     images: [
-      "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=1200&q=80",
-      "https://images.unsplash.com/photo-1506015391300-4802dc74de2e?auto=format&fit=crop&w=1200&q=80"
+      "https://pub-fd2ae53de5ae41b1aee16df0031dc281.r2.dev/vehicles/byd-yangwang-u8.jpg",
+      "https://pub-fd2ae53de5ae41b1aee16df0031dc281.r2.dev/vehicles/jetour-t2.jpg"
     ],
     color_options: [
       { name: "Obsidian Black", hex: "#111111" },
@@ -76,8 +76,8 @@ export const INITIAL_VEHICLES: Vehicle[] = [
     featured: true,
     status: "Available",
     images: [
-      "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=1200&q=80",
-      "https://images.unsplash.com/photo-1502877338535-766e1452684a?auto=format&fit=crop&w=1200&q=80"
+      "https://pub-fd2ae53de5ae41b1aee16df0031dc281.r2.dev/vehicles/zeekr-001.jpg",
+      "https://pub-fd2ae53de5ae41b1aee16df0031dc281.r2.dev/vehicles/chery-tiggo-9.jpg"
     ],
     color_options: [
       { name: "Electric Blue", hex: "#1D3557" },
@@ -104,8 +104,8 @@ export const INITIAL_VEHICLES: Vehicle[] = [
     featured: true,
     status: "Available",
     images: [
-      "https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?auto=format&fit=crop&w=1200&q=80",
-      "https://images.unsplash.com/photo-1508974239320-0a029497e820?auto=format&fit=crop&w=1200&q=80"
+      "https://pub-fd2ae53de5ae41b1aee16df0031dc281.r2.dev/vehicles/li-auto-l9.jpg",
+      "https://pub-fd2ae53de5ae41b1aee16df0031dc281.r2.dev/vehicles/voyah-dreamer.jpg"
     ],
     color_options: [
       { name: "Gold Metallic", hex: "#D4AF37" },
@@ -132,8 +132,7 @@ export const INITIAL_VEHICLES: Vehicle[] = [
     featured: false,
     status: "Available",
     images: [
-      "https://images.unsplash.com/photo-1541348263662-e0c8de4259ba?auto=format&fit=crop&w=1200&q=80",
-      "https://images.unsplash.com/photo-1525609004556-c46c7d6cf023?auto=format&fit=crop&w=1200&q=80"
+      "https://pub-fd2ae53de5ae41b1aee16df0031dc281.r2.dev/vehicles/nio-et7.jpg"
     ],
     color_options: [
       { name: "Star Gray", hex: "#6C757D" },
@@ -160,8 +159,7 @@ export const INITIAL_VEHICLES: Vehicle[] = [
     featured: false,
     status: "Available",
     images: [
-      "https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1200&q=80",
-      "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=1200&q=80"
+      "https://pub-fd2ae53de5ae41b1aee16df0031dc281.r2.dev/vehicles/byd-seal.jpg"
     ],
     color_options: [
       { name: "Atlantis Gray", hex: "#4A5568" },
@@ -187,7 +185,7 @@ export const INITIAL_VEHICLES: Vehicle[] = [
     featured: false,
     status: "Available",
     images: [
-      "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=1200&q=80"
+      "https://pub-fd2ae53de5ae41b1aee16df0031dc281.r2.dev/vehicles/jetour-t2.jpg"
     ],
     color_options: [
       { name: "Desert Sand", hex: "#C2B280" },
@@ -214,7 +212,7 @@ export const INITIAL_VEHICLES: Vehicle[] = [
     featured: false,
     status: "Available",
     images: [
-      "https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?auto=format&fit=crop&w=1200&q=80"
+      "https://pub-fd2ae53de5ae41b1aee16df0031dc281.r2.dev/vehicles/chery-tiggo-9.jpg"
     ],
     description: "Chery's flagship luxury 7-seat hybrid SUV featuring CDC electromagnetic suspension, Sony 14-speaker sound system, and zero-gravity passenger lounger.",
   },
@@ -236,7 +234,7 @@ export const INITIAL_VEHICLES: Vehicle[] = [
     featured: false,
     status: "Available",
     images: [
-      "https://images.unsplash.com/photo-1617788138017-80ad40651399?auto=format&fit=crop&w=1200&q=80"
+      "https://pub-fd2ae53de5ae41b1aee16df0031dc281.r2.dev/vehicles/geely-galaxy-e8.jpg"
     ],
     description: "World's lowest drag coefficient of 0.199 Cd, massive 45-inch 8K borderless unibody screen, and SEA architecture engineered with Volvo safety DNA.",
   },
@@ -258,7 +256,7 @@ export const INITIAL_VEHICLES: Vehicle[] = [
     featured: false,
     status: "Available",
     images: [
-      "https://images.unsplash.com/photo-1508974239320-0a029497e820?auto=format&fit=crop&w=1200&q=80"
+      "https://pub-fd2ae53de5ae41b1aee16df0031dc281.r2.dev/vehicles/voyah-dreamer.jpg"
     ],
     description: "First-class business carrier with airplane-style reclining massage seats, air suspension with magic carpet road preview, and 5-star C-NCAP safety rating.",
   }
