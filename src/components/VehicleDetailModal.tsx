@@ -4,6 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import { Vehicle } from "@/types/vehicle";
 import { PORT_SHIPPING_RATES } from "@/lib/data/vehicles";
+import { PortSelectorModal } from "./PortSelectorModal";
 import {
   X,
   ShieldCheck,
@@ -181,17 +182,11 @@ export function VehicleDetailModal({
               {/* Destination Port Select */}
               <div>
                 <label className="block text-xs font-bold text-neutral-700 mb-1.5">Destination Port & Country</label>
-                <select
-                  value={selectedPortIndex}
-                  onChange={(e) => setSelectedPortIndex(Number(e.target.value))}
-                  className="w-full text-sm font-semibold p-3 bg-white rounded-xl border border-neutral-300 text-neutral-900 focus:outline-hidden focus:ring-2 focus:ring-neutral-900"
-                >
-                  {PORT_SHIPPING_RATES.map((p, idx) => (
-                    <option key={`${p.country}-${p.port}`} value={idx}>
-                      {p.country} — {p.port} ({p.region})
-                    </option>
-                  ))}
-                </select>
+                <PortSelectorModal
+                  selectedPortIndex={selectedPortIndex}
+                  onSelectPortIndex={setSelectedPortIndex}
+                  shippingMode={shippingMode}
+                />
               </div>
 
               {/* Shipping Method */}

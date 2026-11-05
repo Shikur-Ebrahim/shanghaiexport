@@ -436,21 +436,33 @@ export function VehicleCatalog({
                 />
               </div>
 
-              {/* Sort Order */}
+              {/* Sort Order (Mobile-First Touch Target Pills) */}
               <div>
                 <label className="block text-xs font-bold text-neutral-700 mb-2 uppercase tracking-wider">
                   Sort By
                 </label>
-                <select
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value as any)}
-                  className="w-full text-xs font-semibold p-2.5 bg-neutral-50 border border-neutral-300 rounded-xl"
-                >
-                  <option value="featured">Featured First</option>
-                  <option value="price-asc">Price: Low to High</option>
-                  <option value="price-desc">Price: High to Low</option>
-                  <option value="range">Longest Range First</option>
-                </select>
+                <div className="grid grid-cols-2 gap-2">
+                  {[
+                    { id: "featured", label: "Featured First" },
+                    { id: "price-asc", label: "Price: Low to High" },
+                    { id: "price-desc", label: "Price: High to Low" },
+                    { id: "range", label: "Longest Range First" },
+                  ].map((opt) => (
+                    <button
+                      key={opt.id}
+                      type="button"
+                      onClick={() => setSortBy(opt.id as any)}
+                      className={`min-h-[42px] px-3 py-2 rounded-xl text-xs font-bold transition-all border text-left flex items-center justify-between cursor-pointer active:scale-95 ${
+                        sortBy === opt.id
+                          ? "bg-neutral-950 text-white border-neutral-950 shadow-xs"
+                          : "bg-white text-neutral-700 border-neutral-200 hover:bg-neutral-50"
+                      }`}
+                    >
+                      <span>{opt.label}</span>
+                      {sortBy === opt.id && <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />}
+                    </button>
+                  ))}
+                </div>
               </div>
 
             </div>

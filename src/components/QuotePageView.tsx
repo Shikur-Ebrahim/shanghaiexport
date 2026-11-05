@@ -8,6 +8,7 @@ import { PORT_SHIPPING_RATES, INITIAL_VEHICLES } from "@/lib/data/vehicles";
 import { fetchVehicles } from "@/lib/services/vehicles";
 import { submitInquiry } from "@/lib/services/inquiries";
 import { Vehicle, PortRate } from "@/types/vehicle";
+import { ModernSelect } from "./ModernSelect";
 import {
   ArrowLeft,
   Send,
@@ -319,27 +320,27 @@ Email: ${email}`;
                 /* Select or Type Vehicle */
                 <div className="space-y-3">
                   <div>
-                    <label className="block text-xs font-bold text-neutral-700 mb-1.5">
-                      Choose from Inventory or Enter Custom Model
-                    </label>
-                    <select
+                    <ModernSelect
+                      label="Choose from Inventory or Enter Custom Model"
                       value={selectedVehicleId}
-                      onChange={(e) => {
-                        setSelectedVehicleId(e.target.value);
-                        if (e.target.value) {
-                          const found = vehiclesList.find((v) => v.id === e.target.value);
+                      onChange={(val) => {
+                        setSelectedVehicleId(val);
+                        if (val) {
+                          const found = vehiclesList.find((v) => v.id === val);
                           if (found) setCustomVehicleName(found.name);
                         }
                       }}
-                      className="w-full h-11 px-3.5 rounded-xl border border-neutral-300 bg-white text-xs sm:text-sm font-medium text-neutral-900 focus:outline-neutral-950"
-                    >
-                      <option value="">-- Select from Chinese Vehicle Catalog --</option>
-                      {vehiclesList.map((car) => (
-                        <option key={car.id} value={car.id}>
-                          {car.name} ({car.year}) — FOB ${car.price_fob_usd.toLocaleString()} USD
-                        </option>
-                      ))}
-                    </select>
+                      placeholder="-- Select from Chinese Vehicle Catalog --"
+                      modalTitle="Select Vehicle from Inventory"
+                      options={vehiclesList.map((car) => ({
+                        value: car.id,
+                        label: `${car.name} (${car.year})`,
+                        subLabel: `${car.fuel_type} • ${car.body_type}`,
+                        badge: `$${car.price_fob_usd.toLocaleString()} FOB`,
+                        icon: <Car className="w-4 h-4 text-neutral-600" />,
+                      }))}
+                      icon={<Car className="w-4 h-4" />}
+                    />
                   </div>
 
                   {!selectedVehicleId && (
@@ -394,42 +395,34 @@ Email: ${email}`;
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 {/* Destination Country */}
-                <div>
-                  <label className="block text-xs font-bold text-neutral-700 mb-1.5">
-                    Destination Country *
-                  </label>
-                  <select
-                    value={selectedCountry}
-                    onChange={(e) => setSelectedCountry(e.target.value)}
-                    required
-                    className="w-full h-11 px-3.5 rounded-xl border border-neutral-300 bg-white text-xs sm:text-sm font-medium text-neutral-900 focus:outline-neutral-950"
-                  >
-                    {countries.map((c) => (
-                      <option key={c} value={c}>
-                        {c}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                <ModernSelect
+                  label="Destination Country *"
+                  value={selectedCountry}
+                  onChange={(val) => setSelectedCountry(val)}
+                  modalTitle="Select Destination Country"
+                  options={countries.map((c) => ({
+                    value: c,
+                    label: c,
+                    icon: <Globe2 className="w-4 h-4 text-neutral-600" />,
+                  }))}
+                  icon={<Globe2 className="w-4 h-4" />}
+                />
 
                 {/* Destination Port */}
-                <div>
-                  <label className="block text-xs font-bold text-neutral-700 mb-1.5">
-                    Destination Port / Border Hub *
-                  </label>
-                  <select
-                    value={selectedPort}
-                    onChange={(e) => setSelectedPort(e.target.value)}
-                    required
-                    className="w-full h-11 px-3.5 rounded-xl border border-neutral-300 bg-white text-xs sm:text-sm font-medium text-neutral-900 focus:outline-neutral-950"
-                  >
-                    {availablePorts.map((p) => (
-                      <option key={p.port} value={p.port}>
-                        {p.port} (~{p.transit_days} days transit)
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                <ModernSelect
+                  label="Destination Port / Border Hub *"
+                  value={selectedPort}
+                  onChange={(val) => setSelectedPort(val)}
+                  modalTitle="Select Destination Port"
+                  options={availablePorts.map((p) => ({
+                    value: p.port,
+                    label: p.port,
+                    subLabel: `${p.country} • ~${p.transit_days} days transit`,
+                    badge: `Ro-Ro $${p.roro_usd.toLocaleString()}`,
+                    icon: <Ship className="w-4 h-4 text-blue-600" />,
+                  }))}
+                  icon={<Ship className="w-4 h-4 text-blue-600" />}
+                />
               </div>
 
               {/* Shipping Method Pills */}

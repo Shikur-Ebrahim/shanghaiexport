@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Vehicle } from "@/types/vehicle";
 import { PORT_SHIPPING_RATES } from "@/lib/data/vehicles";
+import { PortSelectorModal } from "./PortSelectorModal";
 import {
   ArrowLeft,
   Ship,
@@ -18,7 +19,8 @@ import {
   MessageSquare,
   Share2,
   Calendar,
-  CheckCircle2
+  CheckCircle2,
+  Check
 } from "lucide-react";
 
 interface VehicleDetailViewProps {
@@ -280,49 +282,60 @@ Estimated CIF: $${estimatedTotalCif.toLocaleString()} USD`;
                 </span>
               </div>
 
-              {/* Destination Port Selector */}
+              {/* Destination Port Selector (Custom Mobile-First Picker) */}
               <div>
-                <label className="block text-xs font-bold text-neutral-700 mb-1">
-                  Destination Country & Port
-                </label>
-                <select
-                  value={selectedPortIndex}
-                  onChange={(e) => setSelectedPortIndex(Number(e.target.value))}
-                  className="w-full text-xs sm:text-sm font-semibold p-3 bg-neutral-50 rounded-xl border border-neutral-300 text-neutral-900 focus:outline-hidden focus:ring-2 focus:ring-neutral-900"
-                >
-                  {PORT_SHIPPING_RATES.map((p, idx) => (
-                    <option key={`${p.country}-${p.port}`} value={idx}>
-                      {p.country} — {p.port} ({p.region})
-                    </option>
-                  ))}
-                </select>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="block text-xs font-bold text-neutral-800">
+                    Destination Country & Port
+                  </label>
+                  <span className="text-[11px] font-semibold text-blue-600">
+                    Tap to change port
+                  </span>
+                </div>
+                <PortSelectorModal
+                  selectedPortIndex={selectedPortIndex}
+                  onSelectPortIndex={setSelectedPortIndex}
+                  shippingMode={shippingMode}
+                />
               </div>
 
               {/* Shipping Method (Ro-Ro vs Container) */}
               <div>
-                <label className="block text-xs font-bold text-neutral-700 mb-1">Shipping Mode</label>
-                <div className="grid grid-cols-2 gap-2">
+                <label className="block text-xs font-bold text-neutral-800 mb-1.5">Shipping Mode</label>
+                <div className="grid grid-cols-2 gap-2.5">
                   <button
                     type="button"
                     onClick={() => setShippingMode("roro")}
-                    className={`py-2 px-3 rounded-xl text-xs font-bold border transition-all ${
+                    className={`min-h-[52px] p-2.5 sm:p-3 rounded-2xl text-left border-2 transition-all cursor-pointer active:scale-[0.98] ${
                       shippingMode === "roro"
-                        ? "bg-neutral-950 text-white border-neutral-950"
-                        : "bg-neutral-50 text-neutral-700 border-neutral-200 hover:bg-white"
+                        ? "bg-neutral-950 text-white border-neutral-950 shadow-xs"
+                        : "bg-white text-neutral-700 border-neutral-200 hover:border-neutral-300"
                     }`}
                   >
-                    Ro-Ro Carrier Vessel
+                    <div className="text-xs font-bold flex items-center justify-between">
+                      <span>Ro-Ro Vessel</span>
+                      {shippingMode === "roro" && <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />}
+                    </div>
+                    <div className={`text-[10px] mt-0.5 ${shippingMode === "roro" ? "text-neutral-300" : "text-neutral-500"}`}>
+                      ${currentPort.roro_usd.toLocaleString()} • Best Value
+                    </div>
                   </button>
                   <button
                     type="button"
                     onClick={() => setShippingMode("container")}
-                    className={`py-2 px-3 rounded-xl text-xs font-bold border transition-all ${
+                    className={`min-h-[52px] p-2.5 sm:p-3 rounded-2xl text-left border-2 transition-all cursor-pointer active:scale-[0.98] ${
                       shippingMode === "container"
-                        ? "bg-neutral-950 text-white border-neutral-950"
-                        : "bg-neutral-50 text-neutral-700 border-neutral-200 hover:bg-white"
+                        ? "bg-neutral-950 text-white border-neutral-950 shadow-xs"
+                        : "bg-white text-neutral-700 border-neutral-200 hover:border-neutral-300"
                     }`}
                   >
-                    40ft Dedicated Container
+                    <div className="text-xs font-bold flex items-center justify-between">
+                      <span>40ft Container</span>
+                      {shippingMode === "container" && <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />}
+                    </div>
+                    <div className={`text-[10px] mt-0.5 ${shippingMode === "container" ? "text-neutral-300" : "text-neutral-500"}`}>
+                      ${currentPort.container_40ft_usd.toLocaleString()} • Full Enclosure
+                    </div>
                   </button>
                 </div>
               </div>
