@@ -4,7 +4,18 @@ import { useState, useMemo } from "react";
 import Image from "next/image";
 import { Vehicle } from "@/types/vehicle";
 import { BrandPills } from "./BrandPills";
-import { Zap, Gauge, BatteryCharging, ArrowUpRight, Search, SlidersHorizontal, RotateCcw } from "lucide-react";
+import {
+  Search,
+  LayoutGrid,
+  List,
+  SlidersHorizontal,
+  RotateCcw,
+  Zap,
+  Calendar,
+  Gauge,
+  X,
+  Check
+} from "lucide-react";
 
 interface VehicleCatalogProps {
   vehicles: Vehicle[];
@@ -21,22 +32,33 @@ export function VehicleCatalog({
 }: VehicleCatalogProps) {
   const [selectedBrand, setSelectedBrand] = useState(activeBrandFilter);
   const [selectedFuelType, setSelectedFuelType] = useState<string>("All");
+  const [selectedBodyType, setSelectedBodyType] = useState<string>("All");
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState<"featured" | "price-asc" | "price-desc" | "range">("featured");
+  
+  // View mode: "grid" (2-cards parallel on mobile, 4 on desktop) vs "list" (single card row)
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  
+  // Filter drawer for mobile/desktop
+  const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
+  const [maxPrice, setMaxPrice] = useState(160000);
 
   const fuelTypes = ["All", "Pure Electric (BEV)", "Extended Range (EREV)", "Plug-in Hybrid (PHEV)", "Petrol"];
+  const bodyTypes = ["All", "Sedan", "SUV", "Coupe", "MPV", "Off-Road"];
 
   const filteredVehicles = useMemo(() => {
     return vehicles
       .filter((car) => {
         const matchesBrand = selectedBrand ? car.brand.toLowerCase() === selectedBrand.toLowerCase() : true;
         const matchesFuel = selectedFuelType === "All" ? true : car.fuel_type === selectedFuelType;
+        const matchesBody = selectedBodyType === "All" ? true : car.body_type === selectedBodyType;
+        const matchesPrice = car.price_fob_usd <= maxPrice;
         const matchesQuery = searchQuery
           ? car.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
             car.brand.toLowerCase().includes(searchQuery.toLowerCase()) ||
             car.model.toLowerCase().includes(searchQuery.toLowerCase())
           : true;
-        return matchesBrand && matchesFuel && matchesQuery;
+        return matchesBrand && matchesFuel && matchesBody && matchesPrice && matchesQuery;
       })
       .sort((a, b) => {
         if (sortBy === "price-asc") return a.price_fob_usd - b.price_fob_usd;
@@ -44,221 +66,423 @@ export function VehicleCatalog({
         if (sortBy === "range") return (b.range_km || 0) - (a.range_km || 0);
         return (b.featured ? 1 : 0) - (a.featured ? 1 : 0);
       });
-  }, [vehicles, selectedBrand, selectedFuelType, searchQuery, sortBy]);
+  }, [vehicles, selectedBrand, selectedFuelType, selectedBodyType, maxPrice, searchQuery, sortBy]);
+
+  const activeFilterCount =
+    (selectedBrand ? 1 : 0) +
+    (selectedFuelType !== "All" ? 1 : 0) +
+    (selectedBodyType !== "All" ? 1 : 0) +
+    (maxPrice < 160000 ? 1 : 0);
 
   return (
-    <section id="inventory" className="py-12 lg:py-20 bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="inventory" className="py-6 sm:py-12 bg-white">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
         
-        {/* Section Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
-          <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-red-50 text-red-700 border border-red-100 mb-2">
-              <span>FOB Shanghai Direct Inventory</span>
+        {/* =====================================================================
+            SeekAuto Style Top Search Bar
+        ===================================================================== */}
+        <div className="mb-4">
+          <div className="flex items-center gap-2">
+            
+            {/* Search Input Box */}
+            <div className="relative flex-1 flex items-center bg-white rounded-xl sm:rounded-2xl border-2 border-neutral-200 focus-within:border-neutral-900 transition-colors shadow-2xs overflow-hidden">
+              <div className="pl-3 sm:pl-4 text-neutral-400 shrink-0">
+                <Search className="w-4 h-4 sm:w-5 sm:h-5" />
+              </div>
+              <input
+                type="text"
+                placeholder="Search by Brand, Model, Keyword..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full py-2.5 sm:py-3.5 pl-2.5 pr-2 text-xs sm:text-sm font-medium text-neutral-900 placeholder:text-neutral-400 bg-transparent focus:outline-hidden"
+              />
+              <button
+                type="button"
+                onClick={() => {}}
+                className="bg-neutral-950 hover:bg-neutral-800 text-white font-bold text-xs sm:text-sm px-4 sm:px-6 py-2.5 sm:py-3.5 shrink-0 transition-colors"
+              >
+                Search
+              </button>
             </div>
-            <h2 className="text-3xl sm:text-4xl font-bold text-neutral-900 tracking-tight">
-              Export-Ready Vehicles
-            </h2>
-            <p className="text-neutral-500 text-sm sm:text-base mt-1">
-              Select any vehicle to calculate door-to-port shipping rates and request official proforma invoices.
-            </p>
-          </div>
 
-          <div className="text-sm font-semibold text-neutral-600">
-            Showing <span className="text-neutral-900 font-bold">{filteredVehicles.length}</span> vehicles
+            {/* Filter Toggle Button */}
+            <button
+              onClick={() => setFilterDrawerOpen(true)}
+              className={`p-2.5 sm:p-3 rounded-xl sm:rounded-2xl border-2 transition-all shrink-0 flex items-center justify-center relative active:scale-95 ${
+                activeFilterCount > 0
+                  ? "bg-neutral-950 text-white border-neutral-950"
+                  : "bg-white text-neutral-700 border-neutral-200 hover:bg-neutral-50"
+              }`}
+              title="Open Filters"
+              aria-label="Filter Options"
+            >
+              <SlidersHorizontal className="w-5 h-5" />
+              {activeFilterCount > 0 && (
+                <span className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-red-600 text-white text-[10px] font-bold flex items-center justify-center">
+                  {activeFilterCount}
+                </span>
+              )}
+            </button>
           </div>
         </div>
 
         {/* Brand Filter Pills */}
-        <div className="mb-6">
+        <div className="mb-4">
           <BrandPills selectedBrand={selectedBrand} onSelectBrand={setSelectedBrand} />
         </div>
 
-        {/* Search & Secondary Filter Bar */}
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 mb-8 bg-neutral-50 p-2 sm:p-3 rounded-2xl border border-neutral-200">
-          
-          {/* Keyword Search */}
-          <div className="relative flex-1">
-            <Search className="w-4 h-4 text-neutral-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-            <input
-              type="text"
-              placeholder="Search model (e.g. SU7, Yangwang U8, Zeekr 001)..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 text-sm bg-white rounded-xl border border-neutral-200 text-neutral-900 focus:outline-hidden focus:ring-2 focus:ring-neutral-900 placeholder:text-neutral-400"
-            />
+        {/* =====================================================================
+            Section Title & View Mode Toggle (SeekAuto Style)
+        ===================================================================== */}
+        <div className="flex items-center justify-between pb-3 mb-3 border-b border-neutral-100">
+          <div className="flex items-baseline gap-2">
+            <h2 className="text-xl sm:text-2xl font-black text-neutral-950 tracking-tight">
+              New In
+            </h2>
+            <span className="text-xs text-neutral-500 font-medium">
+              ({filteredVehicles.length} vehicles available)
+            </span>
           </div>
 
-          {/* Fuel Type Filters */}
-          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1">
-            {fuelTypes.map((type) => (
-              <button
-                key={type}
-                onClick={() => setSelectedFuelType(type)}
-                className={`min-h-[38px] px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap active:scale-95 ${
-                  selectedFuelType === type
-                    ? "bg-neutral-900 text-white"
-                    : "bg-white text-neutral-600 hover:text-neutral-900 border border-neutral-200"
-                }`}
-              >
-                {type === "Pure Electric (BEV)" ? "BEV Electric" : type === "Extended Range (EREV)" ? "EREV Range Extender" : type === "Plug-in Hybrid (PHEV)" ? "PHEV Hybrid" : type}
-              </button>
-            ))}
-          </div>
-
-          {/* Sort Selector */}
-          <div className="flex items-center gap-2">
-            <SlidersHorizontal className="w-4 h-4 text-neutral-400 hidden lg:block" />
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as any)}
-              className="min-h-[38px] px-3 py-1.5 text-xs font-semibold bg-white border border-neutral-200 rounded-lg text-neutral-800 focus:outline-hidden cursor-pointer"
+          {/* View Mode Toggle: Grid (2 parallel cards) vs List (1 card per row) */}
+          <div className="flex items-center gap-1 bg-neutral-100 p-1 rounded-xl">
+            <button
+              onClick={() => setViewMode("list")}
+              className={`p-1.5 rounded-lg transition-colors ${
+                viewMode === "list"
+                  ? "bg-white text-neutral-950 shadow-xs"
+                  : "text-neutral-400 hover:text-neutral-700"
+              }`}
+              title="1-Column List View"
+              aria-label="List View"
             >
-              <option value="featured">Featured First</option>
-              <option value="price-asc">Price: Low to High</option>
-              <option value="price-desc">Price: High to Low</option>
-              <option value="range">Longest Range</option>
-            </select>
+              <List className="w-4 h-4" />
+            </button>
+
+            <button
+              onClick={() => setViewMode("grid")}
+              className={`p-1.5 rounded-lg transition-colors ${
+                viewMode === "grid"
+                  ? "bg-white text-neutral-950 shadow-xs"
+                  : "text-neutral-400 hover:text-neutral-700"
+              }`}
+              title="2-Column Parallel Grid View"
+              aria-label="Grid View"
+            >
+              <LayoutGrid className="w-4 h-4" />
+            </button>
           </div>
         </div>
 
-        {/* Vehicles Grid */}
+        {/* =====================================================================
+            Vehicle Cards Display (Grid Mode: 2 CARDS PARALLEL ON MOBILE!)
+        ===================================================================== */}
         {filteredVehicles.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredVehicles.map((car) => (
-              <div
-                key={car.id}
-                className="group bg-white rounded-2xl border border-neutral-200/90 overflow-hidden hover:shadow-lg transition-all duration-300 flex flex-col"
-              >
-                {/* Image Container */}
+          viewMode === "grid" ? (
+            /* 2 CARDS PARALLEL ON MOBILE (grid-cols-2), 3 on tablet, 4 on desktop */
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2.5 sm:gap-4 lg:gap-5">
+              {filteredVehicles.map((car) => (
                 <div
+                  key={car.id}
                   onClick={() => onSelectCar(car)}
-                  className="relative w-full h-56 bg-neutral-100 overflow-hidden cursor-pointer"
+                  className="group bg-white rounded-xl sm:rounded-2xl border border-neutral-200/90 hover:border-neutral-900/30 overflow-hidden hover:shadow-md transition-all duration-200 flex flex-col justify-between cursor-pointer"
                 >
-                  <Image
-                    src={car.images[0] || "/logo.png"}
-                    alt={car.name}
-                    fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-500"
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                  />
-                  
-                  {/* Badge */}
-                  <div className="absolute top-3 left-3 flex flex-wrap gap-1.5">
-                    <span className="px-2.5 py-1 rounded-md text-[11px] font-bold bg-white/95 backdrop-blur-xs text-neutral-900 border border-neutral-200 shadow-xs">
-                      {car.year} {car.brand}
-                    </span>
-                    {car.featured && (
-                      <span className="px-2.5 py-1 rounded-md text-[11px] font-bold bg-red-600 text-white">
-                        Popular Export
+                  {/* Image Container */}
+                  <div className="relative w-full aspect-[4/3] bg-neutral-100 overflow-hidden">
+                    <Image
+                      src={car.images[0] || "/logo.png"}
+                      alt={car.name}
+                      fill
+                      className="object-cover group-hover:scale-105 transition-transform duration-300"
+                      sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                    />
+
+                    {/* Top status tag */}
+                    <div className="absolute top-2 left-2 flex gap-1">
+                      <span className="px-1.5 py-0.5 rounded text-[9px] sm:text-[10px] font-bold bg-black/70 text-white backdrop-blur-xs">
+                        {car.year}
                       </span>
-                    )}
+                      {car.featured && (
+                        <span className="px-1.5 py-0.5 rounded text-[9px] sm:text-[10px] font-bold bg-red-600 text-white">
+                          Hot
+                        </span>
+                      )}
+                    </div>
                   </div>
 
-                  {/* Body Type Pill */}
-                  <div className="absolute bottom-3 right-3">
-                    <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-black/60 text-white backdrop-blur-xs">
-                      {car.body_type}
-                    </span>
+                  {/* Card Info Content (SeekAuto Style) */}
+                  <div className="p-2 sm:p-3 flex-1 flex flex-col justify-between">
+                    <div>
+                      {/* Title: 2 lines clamp */}
+                      <h3 className="text-xs sm:text-sm font-bold text-neutral-900 group-hover:text-red-600 transition-colors line-clamp-2 leading-tight">
+                        {car.name}
+                      </h3>
+
+                      {/* Specs Row: Year & Range */}
+                      <div className="flex items-center gap-2 text-[10px] sm:text-xs text-neutral-500 mt-1">
+                        <span className="flex items-center gap-0.5">
+                          <Calendar className="w-3 h-3 text-neutral-400" />
+                          {car.year}
+                        </span>
+                        {car.range_km && (
+                          <span className="flex items-center gap-0.5">
+                            <Zap className="w-3 h-3 text-amber-500" />
+                            {car.range_km}KM
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Price in SeekAuto Red */}
+                      <div className="mt-1.5 flex items-baseline gap-1">
+                        <span className="text-sm sm:text-lg font-black text-red-600 tracking-tight">
+                          ${car.price_fob_usd.toLocaleString()}
+                        </span>
+                        <span className="text-[10px] text-neutral-400 font-medium">FOB</span>
+                      </div>
+                    </div>
+
+                    {/* Spec Tags Pills */}
+                    <div className="flex flex-wrap gap-1 mt-2 pt-2 border-t border-neutral-100">
+                      <span className="text-[9px] sm:text-[10px] px-1.5 py-0.5 rounded bg-neutral-100 text-neutral-600 font-medium">
+                        {car.fuel_type === "Pure Electric (BEV)" ? "BEV" : car.fuel_type === "Extended Range (EREV)" ? "EREV" : car.fuel_type === "Plug-in Hybrid (PHEV)" ? "PHEV" : "Petrol"}
+                      </span>
+                      {car.acceleration_0_100 && (
+                        <span className="text-[9px] sm:text-[10px] px-1.5 py-0.5 rounded bg-neutral-100 text-neutral-600 font-medium">
+                          {car.acceleration_0_100}
+                        </span>
+                      )}
+                      {car.drive_type && (
+                        <span className="text-[9px] sm:text-[10px] px-1.5 py-0.5 rounded bg-neutral-100 text-neutral-600 font-medium">
+                          {car.drive_type}
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
+              ))}
+            </div>
+          ) : (
+            /* 1-COLUMN LIST VIEW (SeekAuto Screenshot 2 style) */
+            <div className="flex flex-col gap-2.5 sm:gap-3">
+              {filteredVehicles.map((car) => (
+                <div
+                  key={car.id}
+                  onClick={() => onSelectCar(car)}
+                  className="group bg-white rounded-xl sm:rounded-2xl border border-neutral-200/90 hover:border-neutral-900/30 p-2.5 sm:p-3 hover:shadow-md transition-all flex items-center gap-3 sm:gap-4 cursor-pointer"
+                >
+                  {/* Thumbnail on left */}
+                  <div className="relative w-28 sm:w-44 aspect-[4/3] rounded-lg sm:rounded-xl overflow-hidden bg-neutral-100 shrink-0">
+                    <Image
+                      src={car.images[0] || "/logo.png"}
+                      alt={car.name}
+                      fill
+                      className="object-cover group-hover:scale-105 transition-transform duration-300"
+                      sizes="(max-width: 640px) 120px, 180px"
+                    />
+                    <div className="absolute top-1.5 left-1.5">
+                      <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-black/70 text-white">
+                        {car.year}
+                      </span>
+                    </div>
+                  </div>
 
-                {/* Card Content */}
-                <div className="p-5 flex-1 flex flex-col justify-between">
-                  <div>
-                    <h3
-                      onClick={() => onSelectCar(car)}
-                      className="text-lg font-bold text-neutral-900 group-hover:text-red-600 transition-colors cursor-pointer line-clamp-1"
-                    >
+                  {/* Details on right */}
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-xs sm:text-base font-bold text-neutral-900 group-hover:text-red-600 transition-colors line-clamp-1">
                       {car.name}
                     </h3>
-                    
-                    <p className="text-xs text-neutral-500 mt-1 line-clamp-1">
-                      {car.fuel_type} • {car.drive_type || "2WD"} • {car.seating} Seats
-                    </p>
 
-                    {/* Key Specs Row */}
-                    <div className="grid grid-cols-3 gap-2 py-3 my-3 border-y border-neutral-100 text-center">
-                      <div>
-                        <div className="text-[10px] text-neutral-400 font-medium">RANGE</div>
-                        <div className="text-sm font-bold text-neutral-800">{car.range_km ? `${car.range_km} km` : "N/A"}</div>
-                      </div>
-                      <div>
-                        <div className="text-[10px] text-neutral-400 font-medium">0-100 KM/H</div>
-                        <div className="text-sm font-bold text-neutral-800">{car.acceleration_0_100 || "N/A"}</div>
-                      </div>
-                      <div>
-                        <div className="text-[10px] text-neutral-400 font-medium">BATTERY</div>
-                        <div className="text-sm font-bold text-neutral-800">{car.battery_kwh ? `${car.battery_kwh} kWh` : "Fuel"}</div>
-                      </div>
+                    <div className="flex items-center gap-2 text-[10px] sm:text-xs text-neutral-500 mt-1">
+                      <span>📅 {car.year}</span>
+                      <span>⚡ {car.range_km ? `${car.range_km} KM Range` : "Petrol"}</span>
+                      {car.acceleration_0_100 && <span>⏱️ {car.acceleration_0_100}</span>}
                     </div>
-                  </div>
 
-                  {/* Price & Actions */}
-                  <div>
-                    <div className="flex items-baseline justify-between mb-4">
-                      <div>
-                        <span className="text-[11px] text-neutral-500 font-medium uppercase tracking-wider block">FOB Shanghai</span>
-                        <span className="text-2xl font-black text-neutral-950">${car.price_fob_usd.toLocaleString()}</span>
-                        <span className="text-xs text-neutral-500 font-normal"> USD</span>
-                      </div>
-                      <span className="text-xs font-semibold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-md border border-emerald-100">
-                        {car.status}
+                    <div className="mt-1.5 flex items-baseline gap-1">
+                      <span className="text-base sm:text-xl font-black text-red-600">
+                        ${car.price_fob_usd.toLocaleString()}
                       </span>
+                      <span className="text-xs text-neutral-400 font-medium">USD FOB Shanghai</span>
                     </div>
 
-                    {/* Button Row (Mobile Screen First) */}
-                    <div className="grid grid-cols-2 gap-2">
-                      <button
-                        onClick={() => onSelectCar(car)}
-                        className="min-h-[44px] px-3 py-2.5 rounded-xl border border-neutral-200 text-neutral-800 hover:bg-neutral-50 text-xs font-bold transition-all text-center flex items-center justify-center gap-1 active:scale-95"
-                      >
-                        <span>Details & Rates</span>
-                        <ArrowUpRight className="w-3.5 h-3.5 text-neutral-400" />
-                      </button>
-
-                      <button
-                        onClick={() => onOpenInquiry(car.name)}
-                        className="min-h-[44px] px-3 py-2.5 rounded-xl bg-neutral-950 text-white hover:bg-neutral-800 text-xs font-bold transition-all text-center flex items-center justify-center active:scale-95 shadow-xs"
-                      >
-                        Inquire Now
-                      </button>
+                    <div className="flex flex-wrap gap-1 mt-1.5">
+                      <span className="text-[10px] px-2 py-0.5 rounded bg-neutral-100 text-neutral-600 font-medium">
+                        {car.fuel_type}
+                      </span>
+                      <span className="text-[10px] px-2 py-0.5 rounded bg-neutral-100 text-neutral-600 font-medium">
+                        {car.body_type}
+                      </span>
+                      {car.battery_kwh && (
+                        <span className="text-[10px] px-2 py-0.5 rounded bg-neutral-100 text-neutral-600 font-medium">
+                          {car.battery_kwh} kWh
+                        </span>
+                      )}
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          /* Empty Search State */
-          <div className="text-center py-16 px-4 bg-neutral-50 rounded-3xl border border-neutral-200">
-            <h3 className="text-lg font-bold text-neutral-900">No vehicles match your search criteria</h3>
-            <p className="text-sm text-neutral-500 mt-1 max-w-md mx-auto">
-              We source any vehicle currently manufactured or sold in China upon request.
-            </p>
-            <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-              <button
-                onClick={() => {
-                  setSelectedBrand("");
-                  setSelectedFuelType("All");
-                  setSearchQuery("");
-                }}
-                className="px-4 py-2.5 rounded-full border border-neutral-300 text-xs font-bold text-neutral-800 bg-white hover:bg-neutral-100 flex items-center gap-1.5"
-              >
-                <RotateCcw className="w-3.5 h-3.5" />
-                <span>Reset Filters</span>
-              </button>
-              <button
-                onClick={() => onOpenInquiry("Custom Vehicle Request")}
-                className="px-5 py-2.5 rounded-full bg-neutral-950 text-white text-xs font-bold hover:bg-neutral-800"
-              >
-                Request Custom Vehicle Sourcing
-              </button>
+              ))}
             </div>
+          )
+        ) : (
+          /* Empty State */
+          <div className="text-center py-16 px-4 bg-neutral-50 rounded-2xl border border-neutral-200">
+            <h3 className="text-base font-bold text-neutral-900">No vehicles match your criteria</h3>
+            <p className="text-xs text-neutral-500 mt-1">Try resetting the filters or searching for another model.</p>
+            <button
+              onClick={() => {
+                setSelectedBrand("");
+                setSelectedFuelType("All");
+                setSelectedBodyType("All");
+                setMaxPrice(160000);
+                setSearchQuery("");
+              }}
+              className="mt-4 px-4 py-2 rounded-full border border-neutral-300 text-xs font-bold text-neutral-800 bg-white hover:bg-neutral-100 inline-flex items-center gap-1.5"
+            >
+              <RotateCcw className="w-3.5 h-3.5" />
+              <span>Reset All Filters</span>
+            </button>
           </div>
         )}
 
       </div>
+
+      {/* =====================================================================
+          Filter Modal / Drawer (SeekAuto Filter Style)
+      ===================================================================== */}
+      {filterDrawerOpen && (
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-black/50 backdrop-blur-xs flex items-center justify-center p-3 sm:p-6 animate-in fade-in duration-150">
+          <div className="bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden border border-neutral-200 flex flex-col max-h-[90vh]">
+            
+            {/* Header */}
+            <div className="flex items-center justify-between px-5 py-4 border-b border-neutral-100 bg-neutral-50/50">
+              <div className="flex items-center gap-2">
+                <SlidersHorizontal className="w-4 h-4 text-neutral-700" />
+                <h3 className="text-sm font-bold text-neutral-900">Filter Export Vehicles</h3>
+              </div>
+              <button
+                onClick={() => setFilterDrawerOpen(false)}
+                className="p-1.5 rounded-full hover:bg-neutral-200 text-neutral-500"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Filter Options Body */}
+            <div className="p-5 space-y-5 overflow-y-auto flex-1">
+              
+              {/* Powertrain */}
+              <div>
+                <label className="block text-xs font-bold text-neutral-700 mb-2 uppercase tracking-wider">
+                  Powertrain / Fuel Type
+                </label>
+                <div className="flex flex-wrap gap-1.5">
+                  {fuelTypes.map((type) => (
+                    <button
+                      key={type}
+                      onClick={() => setSelectedFuelType(type)}
+                      className={`px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all ${
+                        selectedFuelType === type
+                          ? "bg-neutral-950 text-white border-neutral-950"
+                          : "bg-neutral-50 text-neutral-700 border-neutral-200 hover:bg-white"
+                      }`}
+                    >
+                      {type === "Pure Electric (BEV)" ? "Pure EV (BEV)" : type === "Extended Range (EREV)" ? "EREV Hybrid" : type}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Body Style */}
+              <div>
+                <label className="block text-xs font-bold text-neutral-700 mb-2 uppercase tracking-wider">
+                  Body Style
+                </label>
+                <div className="flex flex-wrap gap-1.5">
+                  {bodyTypes.map((body) => (
+                    <button
+                      key={body}
+                      onClick={() => setSelectedBodyType(body)}
+                      className={`px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all ${
+                        selectedBodyType === body
+                          ? "bg-neutral-950 text-white border-neutral-950"
+                          : "bg-neutral-50 text-neutral-700 border-neutral-200 hover:bg-white"
+                      }`}
+                    >
+                      {body}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Price Range Slider */}
+              <div>
+                <div className="flex justify-between items-baseline mb-2">
+                  <label className="text-xs font-bold text-neutral-700 uppercase tracking-wider">
+                    Max Price (FOB USD)
+                  </label>
+                  <span className="text-sm font-bold text-red-600">
+                    ${maxPrice.toLocaleString()} USD
+                  </span>
+                </div>
+                <input
+                  type="range"
+                  min="20000"
+                  max="160000"
+                  step="5000"
+                  value={maxPrice}
+                  onChange={(e) => setMaxPrice(Number(e.target.value))}
+                  className="w-full accent-neutral-950 cursor-pointer"
+                />
+              </div>
+
+              {/* Sort Order */}
+              <div>
+                <label className="block text-xs font-bold text-neutral-700 mb-2 uppercase tracking-wider">
+                  Sort By
+                </label>
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value as any)}
+                  className="w-full text-xs font-semibold p-2.5 bg-neutral-50 border border-neutral-300 rounded-xl"
+                >
+                  <option value="featured">Featured First</option>
+                  <option value="price-asc">Price: Low to High</option>
+                  <option value="price-desc">Price: High to Low</option>
+                  <option value="range">Longest Range First</option>
+                </select>
+              </div>
+
+            </div>
+
+            {/* Footer Buttons */}
+            <div className="p-4 border-t border-neutral-100 bg-neutral-50/50 flex items-center justify-between gap-3">
+              <button
+                type="button"
+                onClick={() => {
+                  setSelectedBrand("");
+                  setSelectedFuelType("All");
+                  setSelectedBodyType("All");
+                  setMaxPrice(160000);
+                  setSearchQuery("");
+                }}
+                className="text-xs font-bold text-neutral-600 hover:text-neutral-900"
+              >
+                Reset
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setFilterDrawerOpen(false)}
+                className="px-6 py-2.5 rounded-full bg-neutral-950 text-white text-xs font-bold hover:bg-neutral-800"
+              >
+                Apply Filters ({filteredVehicles.length})
+              </button>
+            </div>
+
+          </div>
+        </div>
+      )}
+
     </section>
   );
 }

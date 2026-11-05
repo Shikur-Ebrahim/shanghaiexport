@@ -13,18 +13,18 @@ export function Navbar({ onOpenInquiry }: NavbarProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-40 w-full bg-white/90 backdrop-blur-md border-b border-neutral-200">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-20">
+    <header className="sticky top-0 z-40 w-full bg-white/95 backdrop-blur-md border-b border-neutral-200">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-14 sm:h-18">
           
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-3">
+          <Link href="/" className="flex items-center gap-2">
             <Image
               src="/logo.png"
               alt="ShanghaiExport Logo"
-              width={180}
-              height={70}
-              className="h-12 w-auto object-contain"
+              width={160}
+              height={55}
+              className="h-9 sm:h-11 w-auto object-contain"
               priority
             />
           </Link>
