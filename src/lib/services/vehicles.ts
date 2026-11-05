@@ -24,6 +24,28 @@ export async function fetchVehicles(): Promise<Vehicle[]> {
   return localVehiclesState;
 }
 
+export async function fetchVehicleById(id: string): Promise<Vehicle | null> {
+  try {
+    if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+      const supabase = createBrowserClient();
+      const { data, error } = await supabase
+        .from("vehicles")
+        .select("*")
+        .eq("id", id)
+        .single();
+
+      if (!error && data) {
+        return data as Vehicle;
+      }
+    }
+  } catch (err) {
+    console.warn("Supabase fetch vehicle by id failed, checking fallback:", err);
+  }
+
+  const found = localVehiclesState.find((v) => v.id === id) || INITIAL_VEHICLES.find((v) => v.id === id);
+  return found || null;
+}
+
 export async function saveVehicle(vehicle: Vehicle): Promise<Vehicle> {
   try {
     if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {

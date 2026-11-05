@@ -9,13 +9,11 @@ import { VehicleCatalog } from "@/components/VehicleCatalog";
 import { HowItWorks } from "@/components/HowItWorks";
 import { ShippingAssurance } from "@/components/ShippingAssurance";
 import { Footer } from "@/components/Footer";
-import { VehicleDetailModal } from "@/components/VehicleDetailModal";
 import { InquiryModal } from "@/components/InquiryModal";
 import { MessageSquare } from "lucide-react";
 
 export default function Home() {
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
-  const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null);
   const [inquiryModalOpen, setInquiryModalOpen] = useState(false);
   const [targetCarName, setTargetCarName] = useState("");
   const [targetPort, setTargetPort] = useState("");
@@ -31,10 +29,6 @@ export default function Home() {
     setInquiryModalOpen(true);
   };
 
-  const handleSelectCar = (car: Vehicle) => {
-    setSelectedVehicle(car);
-  };
-
   return (
     <div className="min-h-screen bg-white text-neutral-900 flex flex-col font-sans selection:bg-neutral-900 selection:text-white">
       {/* Top Navbar */}
@@ -48,7 +42,6 @@ export default function Home() {
         {/* Vehicle Catalog with Filters */}
         <VehicleCatalog
           vehicles={vehicles}
-          onSelectCar={handleSelectCar}
           onOpenInquiry={handleOpenInquiry}
           activeBrandFilter={activeBrandFilter}
         />
@@ -62,13 +55,6 @@ export default function Home() {
 
       {/* Footer */}
       <Footer />
-
-      {/* Interactive Vehicle Details Modal & Door-to-Port Shipping Calculator */}
-      <VehicleDetailModal
-        vehicle={selectedVehicle}
-        onClose={() => setSelectedVehicle(null)}
-        onOpenInquiry={handleOpenInquiry}
-      />
 
       {/* Official RFQ / Inquiry Modal */}
       <InquiryModal

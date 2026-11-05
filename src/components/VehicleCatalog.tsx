@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { Vehicle } from "@/types/vehicle";
 import { BrandPills } from "./BrandPills";
 import {
@@ -19,7 +20,7 @@ import {
 
 interface VehicleCatalogProps {
   vehicles: Vehicle[];
-  onSelectCar: (car: Vehicle) => void;
+  onSelectCar?: (car: Vehicle) => void;
   onOpenInquiry: (carName: string) => void;
   activeBrandFilter?: string;
 }
@@ -182,10 +183,10 @@ export function VehicleCatalog({
             /* 2 CARDS PARALLEL ON MOBILE (grid-cols-2), 3 on tablet, 4 on desktop */
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2.5 sm:gap-4 lg:gap-5">
               {filteredVehicles.map((car) => (
-                <div
+                <Link
                   key={car.id}
-                  onClick={() => onSelectCar(car)}
-                  className="group bg-white rounded-xl sm:rounded-2xl border border-neutral-200/90 hover:border-neutral-900/30 overflow-hidden hover:shadow-md transition-all duration-200 flex flex-col justify-between cursor-pointer"
+                  href={`/vehicles/${car.id}`}
+                  className="group bg-white rounded-xl sm:rounded-2xl border border-neutral-200/90 hover:border-neutral-900/30 overflow-hidden hover:shadow-md transition-all duration-200 flex flex-col justify-between"
                 >
                   {/* Image Container */}
                   <div className="relative w-full aspect-[4/3] bg-neutral-100 overflow-hidden">
@@ -258,17 +259,17 @@ export function VehicleCatalog({
                       )}
                     </div>
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
           ) : (
             /* 1-COLUMN LIST VIEW (SeekAuto Screenshot 2 style) */
             <div className="flex flex-col gap-2.5 sm:gap-3">
               {filteredVehicles.map((car) => (
-                <div
+                <Link
                   key={car.id}
-                  onClick={() => onSelectCar(car)}
-                  className="group bg-white rounded-xl sm:rounded-2xl border border-neutral-200/90 hover:border-neutral-900/30 p-2.5 sm:p-3 hover:shadow-md transition-all flex items-center gap-3 sm:gap-4 cursor-pointer"
+                  href={`/vehicles/${car.id}`}
+                  className="group bg-white rounded-xl sm:rounded-2xl border border-neutral-200/90 hover:border-neutral-900/30 p-2.5 sm:p-3 hover:shadow-md transition-all flex items-center gap-3 sm:gap-4"
                 >
                   {/* Thumbnail on left */}
                   <div className="relative w-28 sm:w-44 aspect-[4/3] rounded-lg sm:rounded-xl overflow-hidden bg-neutral-100 shrink-0">
@@ -319,7 +320,7 @@ export function VehicleCatalog({
                       )}
                     </div>
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
           )

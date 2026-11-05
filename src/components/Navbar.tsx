@@ -31,18 +31,18 @@ export function Navbar({ onOpenInquiry }: NavbarProps) {
 
           {/* Desktop Navigation */}
           <nav className="hidden lg:flex items-center gap-8">
-            <a href="#inventory" className="text-sm font-medium text-neutral-700 hover:text-black transition-colors">
+            <Link href="/#inventory" className="text-sm font-medium text-neutral-700 hover:text-black transition-colors">
               Vehicle Inventory
-            </a>
-            <a href="#how-it-works" className="text-sm font-medium text-neutral-700 hover:text-black transition-colors">
+            </Link>
+            <Link href="/#how-it-works" className="text-sm font-medium text-neutral-700 hover:text-black transition-colors">
               How to Export
-            </a>
-            <a href="#shipping" className="text-sm font-medium text-neutral-700 hover:text-black transition-colors">
+            </Link>
+            <Link href="/#shipping" className="text-sm font-medium text-neutral-700 hover:text-black transition-colors">
               Shipping & Ports
-            </a>
-            <a href="#inspection" className="text-sm font-medium text-neutral-700 hover:text-black transition-colors">
+            </Link>
+            <Link href="/#inspection" className="text-sm font-medium text-neutral-700 hover:text-black transition-colors">
               150-Point Inspection
-            </a>
+            </Link>
             <Link href="/admin" className="text-xs font-semibold uppercase tracking-wider text-neutral-500 hover:text-neutral-900 px-3 py-1.5 rounded-full border border-neutral-200 bg-neutral-50">
               Admin Portal
             </Link>
@@ -92,24 +92,24 @@ export function Navbar({ onOpenInquiry }: NavbarProps) {
       {mobileMenuOpen && (
         <div className="lg:hidden bg-white border-b border-neutral-200 px-4 pt-3 pb-6 shadow-xl animate-in slide-in-from-top-4 duration-200">
           <div className="flex flex-col gap-2">
-            <a
-              href="#inventory"
+            <Link
+              href="/#inventory"
               onClick={() => setMobileMenuOpen(false)}
               className="flex items-center justify-between p-3.5 rounded-xl hover:bg-neutral-50 text-base font-medium text-neutral-800"
             >
               <span>Vehicle Inventory</span>
               <ChevronRight className="w-4 h-4 text-neutral-400" />
-            </a>
-            <a
-              href="#how-it-works"
+            </Link>
+            <Link
+              href="/#how-it-works"
               onClick={() => setMobileMenuOpen(false)}
               className="flex items-center justify-between p-3.5 rounded-xl hover:bg-neutral-50 text-base font-medium text-neutral-800"
             >
               <span>Export Process</span>
               <ChevronRight className="w-4 h-4 text-neutral-400" />
-            </a>
-            <a
-              href="#shipping"
+            </Link>
+            <Link
+              href="/#shipping"
               onClick={() => setMobileMenuOpen(false)}
               className="flex items-center justify-between p-3.5 rounded-xl hover:bg-neutral-50 text-base font-medium text-neutral-800"
             >
@@ -118,9 +118,9 @@ export function Navbar({ onOpenInquiry }: NavbarProps) {
                 <span>Shipping & Ports</span>
               </div>
               <ChevronRight className="w-4 h-4 text-neutral-400" />
-            </a>
-            <a
-              href="#inspection"
+            </Link>
+            <Link
+              href="/#inspection"
               onClick={() => setMobileMenuOpen(false)}
               className="flex items-center justify-between p-3.5 rounded-xl hover:bg-neutral-50 text-base font-medium text-neutral-800"
             >
@@ -129,7 +129,7 @@ export function Navbar({ onOpenInquiry }: NavbarProps) {
                 <span>Quality & Inspection</span>
               </div>
               <ChevronRight className="w-4 h-4 text-neutral-400" />
-            </a>
+            </Link>
 
             <div className="pt-3 border-t border-neutral-100 flex flex-col gap-2">
               <Link
